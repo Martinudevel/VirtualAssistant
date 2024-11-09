@@ -5,7 +5,19 @@ from pymongo import MongoClient
 client = polygon.RESTClient(
     api_key="0b_OzOzhi4hrhdQIBgjeNF1VOr2OYCUc")
 
+class Tracking:
+    def __init__(self):
+        # Connect to MongoDB
+        self.client = MongoClient("mongodb+srv://Arafat:negrusa2@bank.ggwz1.mongodb.net/bank?retryWrites=true&w=majority")
+        self.db = self.client.bank
+        self.collection = self.db.transactions
 
+    def get_transactions(self):
+            # Fetch data from MongoDB
+            return list(self.collection.find())
+    def close(self):
+            # Close the MongoDB client
+            self.client.close()
 
 # Create a tracking database
 response = client.get_aggs(

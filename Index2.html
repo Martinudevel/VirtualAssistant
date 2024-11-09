@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbox and Graph Example</title>
+    <style>
+        body {
+            background-color: gold;
+            color: black;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            align-items: center; /* Center items vertically */
+            height: 100vh;
+            flex-direction: column; /* Stack items vertically */
+        }
+        .chatbox {
+            background-color: #333; /* Dark grey background */
+            color: white;
+            width: 300px;
+            height: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px; /* Add some margin to the bottom */
+        }
+        .input-box {
+            display: flex;
+            margin-top: 10px;
+        }
+        .input-box input {
+            flex-grow: 1;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .input-box button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: gold; /* Gold background for the button */
+            color: black; /* Black text color for better contrast */
+            margin-left: 5px;
+        }
+        .chartbox {
+            width: 400px; /* Adjust the width as needed */
+            height: 300px; /* Adjust the height as needed */
+            background-color: #333; /* Dark grey background for the chart box */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Stack items vertically */
+            margin-bottom: 20px; /* Add some margin to the bottom */
+        }
+        .listbox {
+            width: 400px; /* Adjust the width as needed */
+            background-color: #333; /* Dark grey background for the list box */
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        .listbox table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .listbox th, .listbox td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .listbox th {
+            background-color: #444;
+        }
+        .scanbox {
+            width: 100px; /* Adjust the width as needed */
+            background-color: #333; /* Dark grey background for the scan box */
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px; /* Add some margin to the bottom */
+        }
+        .scanbox button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: gold; /* Gold background for the button */
+            color: black; /* Black text color for better contrast */
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbox">
+        <h2>Chatbox</h2>
+        <div class="messages" id="messages"></div>
+        <div class="input-box">
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <div class="chartbox">
+        <canvas id="chart"></canvas>
+    </div>
+    <div class="listbox">
+        <h2>Istoric Tranzactii</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Spending</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2023-01-01</td>
+                    <td>200</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>2023-02-01</td>
+                    <td>150</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>2023-03-01</td>
+                    <td>300</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>2023-04-01</td>
+                    <td>250</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>2023-05-01</td>
+                    <td>100</td>
+                    <td>1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="scanbox">
+    <input type="file" id="fileInput" multiple>
+    <button id="scanButton">Scan</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var base64String = '';
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const messages = document.getElementById('messages');
+            const message = document.createElement('div');
+            message.textContent = input.value;
+            messages.appendChild(message);
+            input.value = '';
+        }
+
+        // Example chart setup
+        const ctx = document.getElementById('chart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Statistics',
+                    data: [12, 19, 3, 5, 2, 3, 7],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        /*document.getElementById('scanButton').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            console.log(formData);
+            fetch('/temp', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                console.log(data);
+                resultsDiv.innerHTML = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+            console.log('Scanning file:', file.name);
+        });*/
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0]; // The selected file (Blob)
+    
+    if (file) {
+        // Create a Blob from the file
+        const blob = new Blob([file], { type: "image/jpeg" });
+
+        // You can now use the `blob` object, e.g., display the image or upload it.
+        console.log(blob);
+        
+        // Optional: Create an object URL to display the image
+        const imageUrl = URL.createObjectURL(blob);
+        const imgElement = document.createElement('img');
+        imgElement.src = imageUrl;
+        document.body.appendChild(imgElement);
+        const reader = new FileReader();
+
+        // This function will be triggered once the file is read
+        reader.onloadend = function() {
+            const base64String = reader.result;  // This is the Base64 string of the image
+            
+            console.log(base64String);  // You can see the Base64 string in the console
+
+            // Now send the Base64 string to the server (e.g., via fetch or XHR)
+            fetch('/process_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: base64String }),  // Send the Base64 string
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('OCR Results:', data);  // Handle the response from the server
+            })
+            .catch(error => {
+                console.error('Error sending the image to the server:', error);
+            });
+        };
+        // Read the file as a Data URL (Base64 encoded string)
+        reader.readAsDataURL(file);
+        return base64String;
+    }
+    db.bank.save(base64String);
+});
+
+    </script>
+</body>
+</html>
