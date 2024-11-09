@@ -2,45 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proiect</title>
+    <meta name="viewport" content="width=device-width, initial-scale: 1.0">
+    <title>Chatbox and Graph Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            background-color: gold; /* Gold background */
-            color: white; /* White text color for better contrast */
-            display: flex;
-            justify-content: flex-start; /* Align items to the start horizontally */
-            align-items: center; /* Center items vertically */
-            height: 100vh;
+            background-color: gold;
+            background-image: url('Raiffeisen-Bank-International-logo.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 940px 530px;
+            color: black;
+            font-family: Arial, sans-serif;
             margin: 0;
-            text-align: center;
-        }
-        .container {
+            padding: 0;
             display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            height: 100%;
-            width: 100%;
+            justify-content: space-between;
+            align-items: flex-start;
+            height: 100vh;
         }
-        .chatbox {
-            width: 300px;
-            height: 400px;
-            background-color: #333; /* Dark grey background */
-            color: white; /* White text color for better contrast */
-            border-radius: 10px;
+        .left-container, .right-container {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
+        }
+        .left-container {
+            margin-top: 0px;
+            margin-left: 0px;
+        }
+        .right-container {
+            margin-top: 50px;
+            margin-right: 20px;
+        }
+        .chatbox, .scanbox, .chartbox, .listbox {
+            background-color: #333;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        .chatbox {
+            position: fixed;
+            height: 100%;
+            width: 400px;
+            overflow-y: auto;
+            margin-left: 400px;
             padding: 10px;
-            margin-left: 20px; /* Add some margin to the left */
+        }
+        .chat-bubble {
+            background-color: gold;
+            color: rgb(0, 0, 0);
+            margin-left: 5px;
+            border: 8px solid gold;
+            border-radius: 5px;
+            margin-top: 10px;
+            max-width: 60%;
+            word-wrap: break-word;
+            word-break: break-word;
+            padding: 5px 10px;
         }
         .messages {
-            flex-grow: 1;
+            position: fixed;
+            margin-top: 40px;
+            padding: 10px;
             overflow-y: auto;
-            margin-bottom: 10px;
+            max-height: 85vh;
+        }
+        .scanbox {
+            width: 100px;
+            padding: 10px;
+            text-align: center;
+        }
+        .chartbox {
+            width: 500px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .listbox {
+            width: 600px;
+            padding: 20px;
         }
         .input-box {
             display: flex;
+            margin-top: 10px;
         }
         .input-box input {
             flex-grow: 1;
@@ -48,45 +95,314 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-        .input-box button {
+        .input-box button, .scanbox button {
             padding: 5px 10px;
             border-radius: 5px;
             border: none;
-            background-color: gold; /* Gold background for the button */
-            color: black; /* Black text color for better contrast */
+            background-color: gold;
+            color: black;
             margin-left: 5px;
+        }
+        .listbox table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .listbox th, .listbox td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .listbox th {
+            background-color: #444;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .gender-button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255);
+            margin-bottom: 20px;
+        }
+        .listbox tr:nth-child(even) {
+            background-color: #444;
+        }
+        .listbox tr:nth-child(odd) {
+            background-color: #555;
+        }
+        .listbox tr:hover {
+            background-color: #666;
+        }
+        .transaction-icon {
+            margin-right: 10px;
+        }
+        .family-filter {
+            margin-bottom: 20px;
+        }
+        .family-filter select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            width: 100%;
+            background-color: #444;
+            color: white;
+            border: 1px solid #666;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="left-container">
         <div class="chatbox">
+            <h2>Chatbox</h2>
             <div class="messages" id="messages"></div>
             <div class="input-box">
-                <input type="text" id="userInput" placeholder="Type a message...">
+                <input type="text" id="messageInput" placeholder="Message" />
                 <button onclick="sendMessage()">Send</button>
             </div>
         </div>
     </div>
+    <div class="right-container">
+        <!-- Gender Button -->
+        <button class="gender-button" onclick="changeBackgroundColor()">Gender</button>
+        
+        <div class="chartbox">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="scanbox">
+            <button>Scan/Upload</button>
+        </div>
 
+        <!-- Transaction Box -->
+        <div class="listbox">
+            <h2>Family Member Transactions</h2>
+
+            <!-- Family Member Filter inside the expenses box -->
+            <div class="family-filter">
+                <select id="familyFilter" onchange="filterFamilyTransactions()">
+                    <option value="all">All Family Members</option>
+                    <option value="child">Child</option>
+                    <option value="mother">Mother</option>
+                    <option value="father">Father</option>
+                </select>
+            </div>
+
+            <!-- Table for each family member -->
+            <div id="childTransactions">
+                <h3>Child's Expenses</h3>
+                <table id="childTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Cost (RON)</th>
+                            <th>Provider</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="motherTransactions">
+                <h3>Mother's Expenses</h3>
+                <table id="motherTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Cost (RON)</th>
+                            <th>Provider</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="fatherTransactions">
+                <h3>Father's Expenses</h3>
+                <table id="fatherTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Cost (RON)</th>
+                            <th>Provider</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        async function sendMessage() {
-            const userInput = document.getElementById('userInput');
-            const messages = document.getElementById('messages');
+        // Data for transactions and chart
+        const providers = [
+            { name: 'UPC Romania (Internet)', icon: 'fas fa-wifi' },
+            { name: 'Netflix (Streaming)', icon: 'fas fa-film' },
+            { name: 'Carrefour (Groceries)', icon: 'fas fa-shopping-cart' },
+            { name: 'Amazon (Shopping)', icon: 'fas fa-box' }
+        ];
 
-            if (userInput.value.trim() !== "") {
-                const userMessage = document.createElement('div');
-                userMessage.textContent = userInput.value;
-                userMessage.style.textAlign = 'right';
-                messages.appendChild(userMessage);
+        const familyMembers = ['child', 'mother', 'father'];
+        let transactionData = [];
+        let dailySpending = Array(31).fill(0); // Track daily spending for each day of the month (31 days)
 
-                const botMessage = document.createElement('div');
-                botMessage.textContent = "This is a response from the AI.";
-                botMessage.style.textAlign = 'left';
-                messages.appendChild(botMessage);
+        // Generate random transactions for a given month (31 days)
+        function generateRandomTransactions(month) {
+            transactionData = [];  // Clear previous transactions
+            dailySpending = Array(31).fill(0);  // Reset daily spending
 
-                userInput.value = "";
-                messages.scrollTop = messages.scrollHeight;
+            // Generate transactions for each day in the month (31 days)
+            for (let day = 1; day <= 31; day++) {
+                familyMembers.forEach(member => {
+                    // Random chance (50%) for a member to spend money
+                    if (Math.random() > 0.5) {
+                        const randomCost = (Math.random() * 100).toFixed(2);  // Random cost between 0 and 100
+                        const randomProvider = providers[Math.floor(Math.random() * providers.length)];
+                        const transaction = {
+                            date: `2023-01-${day.toString().padStart(2, '0')}`,
+                            cost: parseFloat(randomCost),
+                            provider: randomProvider.name,
+                            icon: randomProvider.icon,
+                            person: member
+                        };
+                        transactionData.push(transaction);
+                        dailySpending[day - 1] += parseFloat(randomCost);  // Add to daily spending
+                    }
+                });
+            }
+            updateFamilyTransactions();  // Update family members' tables
+            updateChart();
+        }
+
+        // Update individual family member's tables
+        function updateFamilyTransactions() {
+            const childTableBody = document.getElementById('childTable').querySelector('tbody');
+            const motherTableBody = document.getElementById('motherTable').querySelector('tbody');
+            const fatherTableBody = document.getElementById('fatherTable').querySelector('tbody');
+
+            // Clear the tables
+            childTableBody.innerHTML = '';
+            motherTableBody.innerHTML = '';
+            fatherTableBody.innerHTML = '';
+
+            transactionData.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.date}</td>
+                    <td>${transaction.cost} RON</td>
+                    <td>${transaction.provider}</td>
+                `;
+
+                if (transaction.person === 'child') {
+                    childTableBody.appendChild(row);
+                } else if (transaction.person === 'mother') {
+                    motherTableBody.appendChild(row);
+                } else if (transaction.person === 'father') {
+                    fatherTableBody.appendChild(row);
+                }
+            });
+        }
+
+        // Filter function to show only the selected family member's expenses
+        function filterFamilyTransactions() {
+            const filterValue = document.getElementById('familyFilter').value;
+
+            // Show all family members' expenses if 'all' is selected
+            if (filterValue === 'all') {
+                document.getElementById('childTransactions').style.display = 'block';
+                document.getElementById('motherTransactions').style.display = 'block';
+                document.getElementById('fatherTransactions').style.display = 'block';
+            } else {
+                // Hide all sections first
+                document.getElementById('childTransactions').style.display = 'none';
+                document.getElementById('motherTransactions').style.display = 'none';
+                document.getElementById('fatherTransactions').style.display = 'none';
+
+                // Show only the selected family's transactions
+                document.getElementById(`${filterValue}Transactions`).style.display = 'block';
+            }
+        }
+
+        // Gender function to toggle background color
+        let currentColor = 'gold';
+        function changeBackgroundColor() {
+            if (currentColor === 'gold') {
+                document.body.style.backgroundColor = 'pink';
+                currentColor = 'pink';
+            } else if (currentColor === 'pink') {
+                document.body.style.backgroundColor = 'blue';
+                currentColor = 'blue';
+            } else {
+                document.body.style.backgroundColor = 'gold';
+                currentColor = 'gold';
+            }
+        }
+
+        // Chart update function with color gradient based on spending
+        const ctx = document.getElementById('chart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Weekly Spendings (RON)',
+                    data: Array(4).fill(0),  // Initially 0 for each week
+                    backgroundColor: [],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function updateChart() {
+            let weekData = Array(4).fill(0);  // Initialize an array for 4 weeks
+
+            // Aggregate daily data into weeks (7 days each)
+            for (let i = 0; i < 4; i++) {
+                let weekStart = i * 7;
+                let weekEnd = Math.min((i + 1) * 7, dailySpending.length); // Ensure we don't exceed 31 days
+                weekData[i] = dailySpending.slice(weekStart, weekEnd).reduce((a, b) => a + b, 0);
+            }
+
+            // Update the chart with weekly data and color gradient based on spending
+            chart.data.datasets[0].data = weekData;
+
+            // Color bars from green to red depending on the spending
+            const maxSpending = Math.max(...weekData);
+            const minSpending = Math.min(...weekData);
+
+            chart.data.datasets[0].backgroundColor = weekData.map(spending => {
+                const normalized = (spending - minSpending) / (maxSpending - minSpending); // Normalize between 0 and 1
+                const red = Math.floor(normalized * 255);
+                const green = Math.floor((1 - normalized) * 255);
+                return `rgb(${red}, ${green}, 0)`; // From green to red
+            });
+
+            chart.update();
+        }
+
+        // Initialize with January data
+        generateRandomTransactions(1);
+
+        // Send Message Function for Chatbox
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+            if (messageText !== "") {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-bubble');
+                messageDiv.textContent = messageText;
+                document.getElementById('messages').appendChild(messageDiv);
+                messageInput.value = ''; // Clear the input after sending
+                messageInput.focus(); // Focus back on the input field
             }
         }
     </script>
