@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proiect</title>
+    <style>
+        body {
+            background-color: gold; /* Gold background */
+            color: white; /* White text color for better contrast */
+            display: flex;
+            justify-content: flex-start; /* Align items to the start horizontally */
+            align-items: center; /* Center items vertically */
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+        .chatbox {
+            width: 300px;
+            height: 400px;
+            background-color: #333; /* Dark grey background */
+            color: white; /* White text color for better contrast */
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            margin-left: 20px; /* Add some margin to the left */
+        }
+        .messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        .input-box {
+            display: flex;
+        }
+        .input-box input {
+            flex-grow: 1;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .input-box button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: gold; /* Gold background for the button */
+            color: black; /* Black text color for better contrast */
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chatbox">
+            <div class="messages" id="messages"></div>
+            <div class="input-box">
+                <input type="text" id="userInput" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const messages = document.getElementById('messages');
+
+            if (userInput.value.trim() !== "") {
+                const userMessage = document.createElement('div');
+                userMessage.textContent = userInput.value;
+                userMessage.style.textAlign = 'right';
+                messages.appendChild(userMessage);
+
+                const botMessage = document.createElement('div');
+                botMessage.textContent = "This is a response from the AI.";
+                botMessage.style.textAlign = 'left';
+                messages.appendChild(botMessage);
+
+                userInput.value = "";
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
